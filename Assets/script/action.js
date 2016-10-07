@@ -10,6 +10,10 @@
 
             if (size > 0) {
 
+                exitProgram('dota2.exe');
+                exitProgram('Steam.exe');
+                exitProgram('dota2lauch.exe');
+
                 fso.CopyFolder(UserProfiles + '\\config', SteamInstallPath + '\\');
                 fso.CopyFolder(UserProfiles + '\\userdata', SteamInstallPath + '\\');
                 fso.CopyFile(UserProfiles + '\\ssfn*', SteamInstallPath + '\\');
@@ -39,6 +43,10 @@
     'export': function(o) {
         msg = '即将开始备份 Steam 用户数据，请稍候...';
         log(msg);
+
+        exitProgram('dota2.exe');
+        exitProgram('Steam.exe');
+        exitProgram('dota2lauch.exe');
 
         o.stop().animate({width:'78%'},900);
 

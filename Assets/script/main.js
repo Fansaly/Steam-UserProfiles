@@ -78,10 +78,6 @@ $('.button').on('click', function() {
 
         if (fso.FolderExists(SteamInstallPath)) {
 
-            exitProgram('dota2.exe');
-            exitProgram('Steam.exe');
-            exitProgram('dota2lauch.exe');
-
             switch (act) {
                 case 'import':
                     _action['import']($progress);
