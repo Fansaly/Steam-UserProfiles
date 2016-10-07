@@ -110,7 +110,6 @@ dialogSize(600, 328);
 // 退出应用程序执行的操作
 quitApp = function() {
     self.close();
-    // DeleteFolder(parentFolder + "\\Toolkit");
     // fso.DeleteFile(masterFile);
 }
 // quitApp();
