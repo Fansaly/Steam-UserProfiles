@@ -1,6 +1,6 @@
 ﻿;!@Install@!UTF-8!
 Title="Steam（国服）客户端用户数据 配置程序"
-BeginPrompt="可以让你快速的导入、导出 Steam（国服）客户端用户数据。"
+BeginPrompt="快速的导入、导出 Steam（国服）客户端用户数据。"
 ExtractPathText="请输入或选择解压目录："
 ExtractTitle="Steam UserProfiles 解压中..."
 ExtractDialogText="请稍候..."
