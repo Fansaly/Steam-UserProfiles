@@ -38,7 +38,7 @@ getOperatingSystem = function() {
         Architecture = Architecture == 32 ? 86 : Architecture;
 
         os["Architecture"]  = "x" + Architecture;
-        os["OSVersion"]     = parseInt(os.Version.replace(/(\d+)\.(\d+).*/g, "$1$2"));
+        os["NT"]            = parseInt(os.Version.replace(/(\d+)\.(\d+).*/g, "$1$2"));
 
         return os;
     }
@@ -47,7 +47,7 @@ getOperatingSystem = function() {
 OS = getOperatingSystem();
 
 // 如果是 vista 或以上版本系统以“管理员身份运行”
-// if (OS.OSVersion >= 60) {
+// if (OS.NT >= 60) {
 //     var file = masterFile;
 //     // 通过扩展名的大小写，来区分第几次运行 hta
 //     if (file.substring(file.length-4) != ".HTA") {
