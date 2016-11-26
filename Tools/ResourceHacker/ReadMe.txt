@@ -1,6 +1,6 @@
 Resource Hacker™
-Version 4.3.20
-Last updated: 20 June 2016
+Version 4.5.28
+Last updated: 14 October 2016
 Copyright © 1999-2016 Angus Johnson
 Freeware - no nags, no ads and fully functional.
 
