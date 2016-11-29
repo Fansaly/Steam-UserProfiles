@@ -1,15 +1,16 @@
 ﻿On Error Resume Next
 
+' Popup
 Function vbPopup(info, time, title, icon)
-    Dim WshShell
-    Set WshShell = CreateObject("WScript.Shell")
-    vbPopup = WshShell.Popup(info, time, title, icon)
+    vbPopup = CreateObject("WScript.Shell").Popup(info, time, title, icon)
 End Function
 
+' MsgBox
 Function vbMsgBox(info, icon, title)
     vbMsgBox = MsgBox(info, icon, title)
 End Function
 
+' 一个正则函数
 Function RegExpTest(patrn, Str, ReStr)
     Dim regEx, Match, Matches   ' 创建变量
     Set regEx = New RegExp      ' 创建正则表达式
@@ -21,9 +22,9 @@ Function RegExpTest(patrn, Str, ReStr)
         If ReStr = "" Then
             Set Matches = regEx.Execute(Str)    ' 执行搜索
             For Each Match in Matches           ' 循环遍历 Matches 集合
-                'RetStr = RetStr & "偏移量 "
-                'RetStr = RetStr & Match.FirstIndex & "。" &vbCrLf& "字符：'"
-                'RetStr = RetStr & Match.Value & "'。" & vbCrLf
+                ' RetStr = RetStr & "偏移量 "
+                ' RetStr = RetStr & Match.FirstIndex & "。" &vbCrLf& "字符：'"
+                ' RetStr = RetStr & Match.Value & "'。" & vbCrLf
                 RetStr = RetStr & Match.Value
             Next
         Else
