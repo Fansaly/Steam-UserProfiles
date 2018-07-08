@@ -1,0 +1,8 @@
+ResourceHacker.ini
+
+/UserProfiles/
+/test/
+/temp/
+
+/*.exe
+/*.7z

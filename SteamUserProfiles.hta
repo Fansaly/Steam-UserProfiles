@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <!--[if lt IE 9]> <html class="ie"> <![endif]-->
 <!--[if (gte IE 9)|!(IE)]><!--> <html> <!--<![endif]-->
 <head>
@@ -6,37 +6,23 @@
 
 <title>Steam UserProfiles</title>
 
-<link rel="stylesheet" type="text/css" href="Assets/lib/bootstrap/css/bootstrap.min.css"/>
-<link rel="stylesheet" type="text/css" href="Assets/lib/font-awesome/css/font-awesome.min.css">
-<!--[if IE 7]>
-<link rel="stylesheet" type="text/css" href="Assets/lib/font-awesome/css/font-awesome-ie7.min.css">
-<![endif]-->
-
 <link rel="stylesheet" type="text/css" href="Assets/css/style.css"/>
 
-<script type="text/javascript" src="Assets/lib/jquery/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="Assets/lib/jquery-1.9.1.min.js"></script>
 <script type="text/javascript" src="Assets/lib/jquery.color.js"></script>
-<script type="text/javascript">
-var HKEY_CLASSES_ROOT   = 0x80000000;
-var HKEY_CURRENT_USER   = 0x80000001;
-var HKEY_LOCAL_MACHINE  = 0x80000002;
-var HKEY_USERS          = 0x80000003;
-var strComputer         = ".";          // 本地计算机
-var OS                  = new Object(); // 操作系统信息
-</script>
-<script type="text/VBScript" src="Assets/script/functions.vbs"></script>
-<script type="text/javascript" src="Assets/script/functions.js"></script>
-<script type="text/javascript" src="Assets/script/basic.js"></script>
 
-<!--[if lt IE 9]>
-    <script type="text/javascript" src="Assets/lib/ie/html5.js"></script>
-<![endif]-->
+<script type="text/VBScript" src="Assets/scripts/functions.vbs"></script>
+<script type="text/javascript" src="Assets/scripts/functions.js"></script>
+<script type="text/javascript" src="Assets/scripts/variables.js"></script>
+<script type="text/javascript" src="Assets/scripts/init.js"></script>
 
 <HTA:APPLICATION ID="SteamUserProfiles"
 ApplicationName="SteamUserProfiles"
 Border="dialog"
 BorderStyle="normal"
 Caption="yes"
+ContextMenu="no"
+Selection="no"
 Icon="Assets/images/SteamPony.ico"
 InnerBorder="no"
 MinimizeButton="yes"
@@ -54,38 +40,38 @@ WindowState="normal"
 <body>
 
 <div id="container">
-    <div id="content">
-        <div id="loading"><div id="loader"></div></div>
+  <div id="content">
+    <div id="loading"><div id="loader"></div></div>
 
-        <div id="notice">
-            <div class="notice">配置 Steam（国服）客户端 用户数据</div>
-        </div>
-
-        <div id="layout">
-            <div class="buttons">
-                <a class="button import" data-action="import"><span>数据导入</span></a>
-                <a class="button export" data-action="export"><span>数据导出</span></a>
-            </div>
-        </div>
-
-        <div id="process">
-            <div class="progress">
-                <div class="progress-bar progress-bar-info progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%">
-                    <span class="sr-only">0%</span>
-                </div>
-            </div>
-        </div>
+    <div id="notice">
+      <div class="notice">配置 Steam 客户端 用户数据</div>
     </div>
 
-    <div id="log">
-        <span class="log"></span>
-        <span class="copyleft"><em>&copy;</em>&nbsp;<a href="https://github.com/Fansaly/Steam-UserProfiles">fansaly</a></span>
+    <div id="layout">
+      <div class="buttons">
+        <a class="button import" data-action="import"><span>数据导入</span></a>
+        <a class="button export" data-action="export"><span>数据导出</span></a>
+      </div>
     </div>
+
+    <div id="process">
+      <div class="progress">
+        <div class="progress-bar progress-bar-info progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width:0%">
+          <span class="sr-only">0%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="log">
+    <span class="log"></span>
+    <span class="copyleft"><em>&copy;</em>&nbsp;<a href="https://github.com/fansaly/Steam-UserProfiles">fansaly</a></span>
+  </div>
 </div>
 
-<script type="text/javascript" src="Assets/script/sprites.js"></script>
-<script type="text/javascript" src="Assets/script/action.js"></script>
-<script type="text/javascript" src="Assets/script/main.js"></script>
+<script type="text/javascript" src="Assets/scripts/sprites.js"></script>
+<script type="text/javascript" src="Assets/scripts/eximport.js"></script>
+<script type="text/javascript" src="Assets/scripts/main.js"></script>
 
 </body>
 </html>
