@@ -58,7 +58,7 @@ var eximport = {
         fso.CopyFolder(UserProfiles + '\\userdata', SteamInstallPath + '\\');
         fso.CopyFile(UserProfiles + '\\ssfn*', SteamInstallPath + '\\');
 
-        setRegStringValue(HKEY_CURRENT_USER, strKeyPath, 'AutoLoginUser', '');
+        setRegStringValue(HKEY_CURRENT_USER, SubKeyPath, 'AutoLoginUser', this._lastLoginUser());
 
         msg = 'Steam 用户数据配置完成，即将启动 Steam 客户端 :）';
         log(msg);
@@ -78,5 +78,32 @@ var eximport = {
       msg = '还没有 Steam 用户数据。';
       log(msg, 1);
     }
+  },
+  '_lastLoginUser': function() {
+    if (!String.prototype.trim) {
+      String.prototype.trim = function() {
+        return this.replace(/(^\s+)|(\s+$)/g, '');
+      };
+    }
+
+    var user = {
+      AccountName: '',
+      Timestamp: 0
+    };
+
+    var text = readVDFContent(UserProfiles + '\\config\\loginusers.vdf');
+    var users = VDF.parse(text).users;
+
+    for (var uid in users) {
+      var AccountName = users[uid]['AccountName'];
+      var Timestamp = parseInt(users[uid]['Timestamp']);
+
+      if (user.Timestamp < Timestamp) {
+        user.AccountName = AccountName;
+        user.Timestamp = Timestamp;
+      }
+    }
+
+    return user.AccountName;
   }
 };

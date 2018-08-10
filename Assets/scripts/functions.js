@@ -70,6 +70,28 @@ function CreateFolder(filespec) {
 
 
 /**
+ * 读取 VDF 文件内容
+ */
+function readVDFContent(file) {
+  var content = '';
+
+  if (fso.FileExists(file)) {
+    var stream = new ActiveXObject('ADODB.Stream');
+
+    stream.Type = 2;
+    stream.Mode = 3;
+    stream.Charset = 'UTF-8';
+    stream.Open;
+    stream.LoadFromFile(file);
+    content = stream.ReadText;
+    stream.Close;
+  }
+
+  return content;
+}
+
+
+/**
  * 设置注册表值: string
  */
 function setRegStringValue(RootKey, SubKeyName, ValueName, Value) {
