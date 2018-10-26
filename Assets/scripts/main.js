@@ -18,92 +18,231 @@
 // });
 
 
-// 日志
+// 进度条及颜色
+var $progress = $('.progress-bar');
+var progressColor = {
+  'success': '#35a260', // 389e60
+  'warning': '#8a6d3b',
+  'normal': '#a0e9fd',
+  'error': '#a94442' // bf3737
+};
+
+// 状态
 var $log = $('.log');
-var log = function(o, error) {
+var log = function(msg, status) {
+  if (status == 'error') {
+    $progress
+      .parent()
+      .animate({
+        backgroundColor: progressColor.error
+      }, 160);
+  } else if (status == 'fail') {
+    $progress
+      .animate({
+        backgroundColor: progressColor.error
+      }, 200)
+      .animate({width: '100%'}, 1e3);
+  } else if (status == 'warning') {
+    $progress
+      .animate({
+        backgroundColor: progressColor.warning
+      }, 200)
+      .animate({width: '100%'}, 1e3);
+  } else if (status == 'success') {
+    $progress
+      .animate({width: '100%'}, 1e3);
+  }
+
   $log.animate({opacity: 0}, 90);
   setTimeout(function() {
-    if (error) {
-      $progress.parent().animate({backgroundColor:progress['error']},160);
+    $log.html(msg).animate({opacity: 1}, 160);
+  }, 120);
+};
+
+
+// 数据 导入、导出
+var eximport = {
+  ex: function() {
+    log('即将开始备份 Steam 用户数据，请稍候 …');
+
+    $progress.stop().animate({width: '10%'}, 100);
+
+    exitProgram('Steam.exe');
+    exitProgram('dota2lauch.exe');
+
+    log('正在打包 Steam 用户数据，请稍候 …');
+    $progress.stop().animate({width: '78%'}, 500);
+
+    var steamInstallPath = this.options.installPath;
+    var userProfiles = this.options.userProfiles;
+
+    deleteFolder(userProfiles);
+    createFolder(userProfiles);
+
+    fso.CopyFolder(steamInstallPath + '\\config', userProfiles + '\\');
+    fso.CopyFolder(steamInstallPath + '\\userdata', userProfiles + '\\');
+    fso.CopyFile(steamInstallPath + '\\ssfn*', userProfiles + '\\');
+
+    var outputFileName = 'Steam_UserProfiles';
+    var outputFile     = masterDir + '\\' + outputFileName + '.exe';
+    var parameters     = '"' + outputFileName + '" "SILENT"';
+
+    WshShell.Run('wscript.exe "' + makefile + '" ' + parameters, 1, true);
+
+    var result = copyToDesktop(outputFile);
+
+    if (result) {
+      deleteFile(outputFile);
+      log('Steam 用户数据备份完成，请在桌面查看 :）', 'success');
+    } else {
+      log('Steam 用户数据文件，复制到桌面失败 :(', 'fail');
+    }
+  },
+  im: function() {
+    log('即将开始配置 Steam 用户数据，请稍候 …');
+
+    var steamInstallPath = this.options.installPath;
+    var userProfiles = this.options.userProfiles;
+
+    if (fso.FolderExists(userProfiles)) {
+      var f = fso.GetFolder(userProfiles);
+      var size = (f.Size/1024/1024).toFixed(2);
+
+      if (size > 0) {
+        exitProgram('Steam.exe');
+        exitProgram('dota2lauch.exe');
+
+        fso.CopyFolder(userProfiles + '\\config', steamInstallPath + '\\');
+        fso.CopyFolder(userProfiles + '\\userdata', steamInstallPath + '\\');
+        fso.CopyFile(userProfiles + '\\ssfn*', steamInstallPath + '\\');
+
+        setRegStringValue(
+          HKEY_CURRENT_USER,
+          this.options.subKeyPath,
+          'AutoLoginUser',
+          this.lastLoginUser()
+        );
+
+        log('Steam 用户数据配置完成，即将启动 Steam 客户端 :）', 'success');
+
+        if (fso.FileExists(steamInstallPath + '\\Steam.exe')) {
+          WshShell.Run('"' + steamInstallPath + '\\Steam.exe"', 1, false);
+        } else if (fso.FileExists(steamInstallPath + '\\dota2lauch.exe')) {
+          WshShell.Run('"' + steamInstallPath + '\\dota2lauch.exe"', 1, false);
+        }
+      } else {
+        log('Steam 用户数据无效。', 'error');
+      }
+    } else {
+      log('还没有 Steam 用户数据。', 'error');
+    }
+  },
+  lastLoginUser: function() {
+    var loginusers = this.options.userProfiles + '\\config\\loginusers.vdf';
+    var text;
+
+    try {
+      text = readUTF8Content(loginusers);
+    } catch (e) {
+      text = readNormalContent(loginusers);
     }
 
-    $log.html(o).animate({opacity: 1}, 160);
-  }, 120);
-}
+    var users = VDF.parse(text).users;
 
-
-// Steam 相关变量
-var SubKeyPath = 'Software\\Valve\\Steam';
-var ValueName = 'InstallPath';
-var SteamInstallPath = '';
-var msg = '';
-
-// 进度条
-var $progress = $('.progress-bar'),
-    progress = {
-      'default': '#a0e9fd',
-      // 'error': '#bf3737'
-      'error': '#a94442'
+    var user = {
+      AccountName: '',
+      Timestamp: 0
     };
 
+    for (var uid in users) {
+      var AccountName = users[uid]['AccountName'];
+      var Timestamp = parseInt(users[uid]['Timestamp']);
 
+      if (user.Timestamp < Timestamp) {
+        user.AccountName = AccountName;
+        user.Timestamp = Timestamp;
+      }
+    }
+
+    return user.AccountName;
+  },
+  init: function() {
+    var userProfiles = masterDir + '\\UserProfiles';
+    var subKeyPath = 'Software\\Valve\\Steam';
+    var valueName = 'InstallPath';
+    var installPath = '';
+
+    // installPath = getProcessAppProperties('Steam.exe');
+    installPath = getRegStringValue(
+      HKEY_LOCAL_MACHINE,
+      setRightRegNodePath(subKeyPath, OS.Architecture),
+      valueName
+    );
+
+    if (!installPath) {
+      log('没有找到 Steam 客户端的安装记录 ╮（︶︿︶）╭', 'error');
+    } else if (!fso.FolderExists(installPath)) {
+      log('Steam 客户端的安装目录不存在  ╮（︶︿︶）╭', 'error');
+    } else {
+      this.options = {
+        subKeyPath: subKeyPath,
+        installPath: installPath,
+        userProfiles: userProfiles
+      };
+
+      log('准备就绪。');
+
+      $('.button')
+        .stop()
+        .animate({opacity: 1}, 365)
+        .removeClass('disabled');
+    }
+  }
+};
+
+// 初始化
+setTimeout(function() {
+  eximport.init();
+}, 0);
+
+
+// 导入、导出事件监听
 $('.button').on('click', function() {
-  var $this = $(this),
-      action = $this.attr('data-action');
+  var $this = $(this);
+  var action = $this.attr('data-action');
 
-  if ($this.data('status')) {
+  if ($this.parent().hasClass('executing') || $this.hasClass('disabled')) {
     return false;
   }
 
-  $this.data('status', true);
-  $this.addClass('active');
+  $this.parent().addClass('executing');
+  $this.stop().animate({opacity: .9}, 365).addClass('active');
 
   stopAnimation();
   startAnimation();
 
-  $progress.parent().animate({backgroundColor:progress['default']},90);
-  $progress.stop().animate({width:'0%'},0);
+  $progress.parent().animate({backgroundColor: progressColor.normal}, 90);
+  $progress.stop().animate({
+    width: '0%',
+    backgroundColor: progressColor.success
+  }, 0);
 
-  msg = '即将开始...';
-  // vbPopup(msg, 2, '提示信息', 0 + 64 + 4096);
-  log(msg);
-
-  SteamInstallPath = getRegStringValue(HKEY_LOCAL_MACHINE, setRightRegNodePath(SubKeyPath, OS.Architecture), ValueName);
-  // SteamInstallPath = getProcessAppProperties('Steam.exe');
-
-  if (SteamInstallPath) {
-    if (fso.FolderExists(SteamInstallPath)) {
-      switch (action) {
-        case 'import':
-          eximport['import']($progress);
-          break;
-        case 'export':
-          eximport['export']($progress);
-          break;
-        default:
-          break;
-      }
-    } else {
-      msg = 'Steam 客户端的安装目录不存在  ╮（︶︿︶）╭';
-      // vbMsgBox(msg + '\n"' + SteamInstallPath + '"', 16, '错误信息');
-      log(msg, 1);
-    }
-  } else {
-    msg = '没有找到 Steam 客户端的安装记录 ╮（︶︿︶）╭';
-    // vbMsgBox(msg, 64, '提示信息');
-    log(msg, 1);
+  if (action === 'import') {
+    eximport.im();
+  } else if (action === 'export') {
+    eximport.ex();
   }
 
   setTimeout(function() {
-    $this.removeClass('active');
-    $this.data('status', false);
-
     stopAnimation();
-  }, 1000);
+
+    $this.stop().animate({opacity: 1}, 365).removeClass('active');
+    $this.parent().removeClass('executing');
+  }, 1e3);
 });
 
 
-$('.copyleft a').on('click', function() {
+$('.copyright a').on('click', function() {
   WshShell.Run('cmd.exe /C start ' + $(this).attr('href'), 0, false);
   return false;
 });
@@ -111,12 +250,13 @@ $('.copyleft a').on('click', function() {
 
 // 清理
 $(window).on('beforeunload', function() {
-  DeleteFolder(Assets);
-  DeleteFolder(Config);
-  DeleteFolder(temp);
-  DeleteFolder(Tools);
-  DeleteFolder(UserProfiles);
+  deleteFolder(eximport.options.userProfiles);
 
-  DeleteFile(make);
-  DeleteFile(masterFile);
+  deleteFolder(assetsDir);
+  deleteFolder(configDir);
+  deleteFolder(tempDir);
+  deleteFolder(toolsDir);
+
+  deleteFile(makefile);
+  deleteFile(masterFile);
 });

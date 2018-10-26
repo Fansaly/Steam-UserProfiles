@@ -11,6 +11,14 @@
 //   }
 // }
 
+/**
+ * trim function
+ */
+if (!String.prototype.trim) {
+  String.prototype.trim = function() {
+    return this.replace(/(^\s+)|(\s+$)/g, '');
+  };
+}
 
 /**
  * 获取任务栏注册表键值名: string
@@ -58,8 +66,8 @@ function getTaskbarState() {
   var taskbarAutoHide = !!(state[2][0] == 3);         // 任务栏自动隐藏状态
   var taskbarLocation = state[3][0];                  // 0-左 1-上 2-右 3-下
 
-  var taskbarStartW = state[4][0] + state[4][1] * 256 // 开始按钮宽（也许）
-  var taskbarStartH = state[5][0] + state[5][1] * 256 // 开始按钮高（也许）
+  var taskbarStartW = state[4][0] + state[4][1] * 256 // 开始按钮宽（或许）
+  var taskbarStartH = state[5][0] + state[5][1] * 256 // 开始按钮高（或许）
 
   var taskbarLeft   = state[6][0] + state[6][1] * 256 // 任务栏左边界
   var taskbarTop    = state[7][0] + state[7][1] * 256 // 任务栏上边界
@@ -69,8 +77,8 @@ function getTaskbarState() {
   // alert(
   //   '任务栏自动隐藏：' + taskbarAutoHide + '\n' +
   //   '任务栏所在位置：' + taskbarLocation + '\n\n' +
-  //   '开始按钮宽（也许）：' + taskbarStartW + '\n' +
-  //   '开始按钮高（也许）：' + taskbarStartH + '\n\n' +
+  //   '开始按钮宽（或许）：' + taskbarStartW + '\n' +
+  //   '开始按钮高（或许）：' + taskbarStartH + '\n\n' +
   //   '任务栏左边界：' + taskbarLeft + '\n' +
   //   '任务栏上边界：' + taskbarTop + '\n' +
   //   '任务栏右边界：' + taskbarRight + '\n' +
@@ -113,4 +121,4 @@ function dialogLocation(w, h) {
   return true;
 }
 
-dialogLocation(600, 328);
+dialogLocation(560, 308);

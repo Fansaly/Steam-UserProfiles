@@ -1,5 +1,5 @@
 /**
- * 检查“对象”是否为空
+ * “对象”是否为空
  */
 function isEmpty(obj) {
   for (var key in obj) {
@@ -11,9 +11,11 @@ function isEmpty(obj) {
 }
 
 
-// 获取 Windows 系统信息
-// https://msdn.microsoft.com/en-us/library/aa394239(v=vs.85).aspx
-function getOperatingSystem() {
+/**
+ * 获取 Windows 系统信息
+ * https://msdn.microsoft.com/en-us/library/aa394239(v=vs.85).aspx
+ */
+function getOperatingSystemInfo() {
   var objWMIService = WbemLocator.ConnectServer(strComputer, 'root\\cimv2');
   var colItems = objWMIService.ExecQuery('Select * from Win32_OperatingSystem');
 
@@ -23,8 +25,8 @@ function getOperatingSystem() {
     var properties = new Enumerator(enumItems.item().Properties_);
     for (; !properties.atEnd(); properties.moveNext()) {
       var name = properties.item().name;
-      var value = properties.item().value ? properties.item().value : null;
-      os[name] = value;
+      var value = properties.item().value;
+      os[name] = value ? value : null;
     }
   }
 
@@ -39,40 +41,80 @@ function getOperatingSystem() {
 
     return os;
   }
-
 }
 
 
 /**
  * 删除指定的文件
  */
-function DeleteFile(filespec) {
-  if (fso.FileExists(filespec)) {
-    fso.DeleteFile(filespec);
+function deleteFile(file) {
+  if (fso.FileExists(file)) {
+    fso.DeleteFile(file);
   }
 }
 /**
  * 删除指定的文件夹和其中的内容
  */
-function DeleteFolder(filespec) {
-  if (fso.FolderExists(filespec)) {
-    fso.DeleteFolder(filespec);
+function deleteFolder(folder) {
+  if (fso.FolderExists(folder)) {
+    fso.DeleteFolder(folder);
   }
 }
 /**
  * 创建指定的文件夹
  */
-function CreateFolder(filespec) {
-  if (!fso.FolderExists(filespec)) {
-    fso.CreateFolder(filespec);
+function createFolder(folder) {
+  if (!fso.FolderExists(folder)) {
+    fso.CreateFolder(folder);
   }
+}
+
+/**
+ * 复制文件到桌面
+ * https://msdn.microsoft.com/en-us/library/windows/desktop/bb787866(v=vs.85).aspx
+ * https://msdn.microsoft.com/en-us/library/windows/desktop/ms723207(v=vs.85).aspx
+ */
+function copyToDesktop(file) {
+  if (!fso.FileExists(file)) {
+    return;
+  }
+
+  var desktopDir = WshShell.SpecialFolders('Desktop');
+  var objFolder = new Object;
+  var result = false;
+
+  try {
+    objFolder = AppShell.NameSpace(desktopDir);
+
+    if (objFolder != null) {
+      objFolder.CopyHere(file, 8);
+      result = true;
+    }
+  } catch (e) {}
+
+  return result;
 }
 
 
 /**
- * 读取 VDF 文件内容
+ * 读取文件内容
  */
-function readVDFContent(file) {
+function readNormalContent(file) {
+  var content = '';
+
+  if (fso.FileExists(file)) {
+    f = fso.OpenTextFile(file, ForReading, true, TristateFalse);
+    content = f.ReadAll();
+    f.Close();
+  }
+
+  return content;
+}
+
+/**
+ * 读取 UTF-8 文件内容
+ */
+function readUTF8Content(file) {
   var content = '';
 
   if (fso.FileExists(file)) {
@@ -234,8 +276,8 @@ function getProcessAppProperties(appName) {
 
     for (; !properties.atEnd(); properties.moveNext()) {
       var name = properties.item().name;
-      var value = properties.item().value ? properties.item().value : null;
-      app[name] = value;
+      var value = properties.item().value;
+      app[name] = value ? value : null;
     }
   }
 
@@ -294,37 +336,45 @@ function checkWindowsPath(str) {
  * 格式化路径
  */
 function formatPath(path, backslash) {
-  path = path.substring(0, path.lastIndexOf('\\'));
+  path = !!path ? path : '';
+
+  var len = path.length;
+  var lastChar = len > 0 ? path.substring((len - 1), len) : '';
+
+  if (lastChar == '\\') {
+    path = path.substring(0, path.lastIndexOf('\\'));
+  }
 
   return backslash ? path + '\\' : path;
 }
 
 
 /**
- * 获取本地时间
+ * 获取时间
  */
-function getLocalTime() {
-  var D = new Date(), date = {};
+function getDateTime() {
+  var D = new Date();
+  var y, m, d, H, i, s;
 
-  date.y = D.getFullYear();
-  date.m = D.getMonth() + 1;
-  date.d = D.getDate();
-  date.H = D.getHours();
-  date.i = D.getMinutes();
-  date.s = D.getSeconds();
+  y = D.getFullYear();
+  m = D.getMonth() + 1;
+  d = D.getDate();
+  H = D.getHours();
+  i = D.getMinutes();
+  s = D.getSeconds();
 
-  date.m = date.m < 10 ? date.m = '0' + date.m : date.m;
-  date.d = date.d < 10 ? date.d = '0' + date.d : date.d;
-  date.H = date.H < 10 ? date.H = '0' + date.H : date.H;
-  date.i = date.i < 10 ? date.i = '0' + date.i : date.i;
-  date.s = date.s < 10 ? date.s = '0' + date.s : date.s;
+  m = m < 10 ? '0' + m : m;
+  d = d < 10 ? '0' + d : d;
+  H = H < 10 ? '0' + H : H;
+  i = i < 10 ? '0' + i : i;
+  s = s < 10 ? '0' + s : s;
 
   return (
-    date.y + "-" +
-    date.m + "-" +
-    date.d + ' ' +
-    date.H + ":" +
-    date.i + ":" +
-    date.s
-   );
+    y + "-" +
+    m + "-" +
+    d + ' ' +
+    H + ":" +
+    i + ":" +
+    s
+  );
 }

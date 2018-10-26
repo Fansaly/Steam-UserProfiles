@@ -44,13 +44,13 @@ WindowState="normal"
     <div id="loading"><div id="loader"></div></div>
 
     <div id="notice">
-      <div class="notice">配置 Steam 客户端 用户数据</div>
+      <div class="notice current">配置 Steam 客户端 用户数据</div>
     </div>
 
     <div id="layout">
       <div class="buttons">
-        <a class="button import" data-action="import"><span>数据导入</span></a>
-        <a class="button export" data-action="export"><span>数据导出</span></a>
+        <a class="button import disabled" data-action="import"><span>导入数据</span></a>
+        <a class="button export disabled" data-action="export"><span>导出数据</span></a>
       </div>
     </div>
 
@@ -64,14 +64,13 @@ WindowState="normal"
   </div>
 
   <div id="log">
-    <span class="log"></span>
-    <span class="copyleft"><em>&copy;</em>&nbsp;<a href="https://github.com/fansaly/Steam-UserProfiles">fansaly</a></span>
+    <span class="log">初始化中 …</span>
+    <span class="copyright"><em>&copy;</em>&nbsp;<a href="https://github.com/fansaly/Steam-UserProfiles">fansaly</a></span>
   </div>
 </div>
 
 <script type="text/javascript" src="Assets/lib/vdf.js"></script>
 <script type="text/javascript" src="Assets/scripts/sprites.js"></script>
-<script type="text/javascript" src="Assets/scripts/eximport.js"></script>
 <script type="text/javascript" src="Assets/scripts/main.js"></script>
 
 </body>
