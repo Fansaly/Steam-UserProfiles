@@ -34,5 +34,6 @@ var WbemLocator = new ActiveXObject('WbemScripting.SWbemLocator');
 var strComputer = '.';
 // 操作系统信息
 var OS          = getOperatingSystemInfo();
+var uiScale     = window.screen.deviceXDPI / 96;
 
 createFolder(tempDir);

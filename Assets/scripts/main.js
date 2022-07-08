@@ -18,6 +18,11 @@
 // });
 
 
+var defaultFontSize = 24;
+var fontSize = uiScale * defaultFontSize;
+$('html').css({ 'font-size': fontSize });
+
+
 // 进度条及颜色
 var $progress = $('.progress-bar');
 var progressColor = {
@@ -250,6 +255,9 @@ $('.copyright a').on('click', function() {
 
 // 清理
 $(window).on('beforeunload', function() {
+  var isSource = fso.FileExists(masterDir + '\\.git\\config');
+  if (isSource) return;
+
   deleteFolder(eximport.options.userProfiles);
 
   deleteFolder(assetsDir);

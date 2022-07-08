@@ -90,6 +90,9 @@ function getTaskbarState() {
 
 // 应用程序窗口位置
 function dialogLocation(w, h) {
+  w *= uiScale;
+  h *= uiScale;
+
   var screenWidth = window.screen.width;
   var screenHeight = window.screen.height;
   var workspaceWidth = window.screen.availWidth;
